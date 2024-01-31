@@ -37,8 +37,8 @@ drive.mount('/content/drive')
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
-from testCases import *
-from dnn_utils import sigmoid, sigmoid_backward, relu, relu_backward
+#from testCases import *
+#from dnn_utils import sigmoid, sigmoid_backward, relu, relu_backward
 
 # %matplotlib inline
 plt.rcParams['figure.figsize'] = (5.0, 4.0) # set default size of plots
@@ -51,6 +51,7 @@ plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
 """## 2 - Outline of the Exr
+
 
 To build your neural network, you will be implementing several "helper functions". These helper functions will be used in the next assignment to build a two-layer neural network and an L-layer neural network. Each small helper function you will implement will have detailed instructions that will walk you through the necessary steps. Here is an outline of this assignment, you will:
 
