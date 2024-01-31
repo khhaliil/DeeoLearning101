@@ -185,22 +185,26 @@ def sigmoid(z):
 
     ### START CODE HERE ### (≈ 1 line of code)
     s=(1/(1+np.exp(-z)))
+    cache = z
     ### END CODE HERE ###
 
-    return s
+    return s,cache
 
-def relu(z):
+def relu(Z):
     """
-    Compute the ReLU of z
+    Compute the ReLU of Z
 
     Arguments:
-    z -- A scalar or numpy array of any size.
+    Z -- A scalar or numpy array of any size.
 
     Return:
-    a -- relu(z)
+    A -- ReLU(Z)
+    cache -- Z, stored for computing the backward pass efficiently
     """
-    a = np.maximum(0, z)
-    return a
+    A = np.maximum(0, Z)
+    cache = Z  # Cache the input value, which is needed for the backward pass
+    return A, cache
+
 
 def sigmoid_backward(dA, z):
     """
