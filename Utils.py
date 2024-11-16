@@ -18,7 +18,172 @@ plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
 
+def initialize_parameters(n_x, n_h, n_y):
+    """
+    Initializes parameters for a two-layer neural network.
 
+    Arguments:
+    n_x -- size of the input layer (number of input features)
+    n_h -- size of the hidden layer
+    n_y -- size of the output layer (number of classes)
+
+    Returns:
+    parameters -- python dictionary containing your parameters:
+                    W1 -- weight matrix of shape (n_h, n_x)
+                    b1 -- bias vector of shape (n_h, 1)
+                    W2 -- weight matrix of shape (n_y, n_h)
+                    b2 -- bias vector of shape (n_y, 1)
+    """
+
+    np.random.seed(1)
+
+    # Initialize weights using He initialization for ReLU activation
+    W1 = np.random.randn(n_h, n_x) * np.sqrt(2. / n_x)
+    b1 = np.zeros((n_h, 1))
+    W2 = np.random.randn(n_y, n_h) * np.sqrt(2. / n_h)
+    b2 = np.zeros((n_y, 1))
+
+    # Ensure that the shapes are correct
+    assert W1.shape == (n_h, n_x), f"W1 shape mismatch: expected {(n_h, n_x)}, got {W1.shape}"
+    assert b1.shape == (n_h, 1), f"b1 shape mismatch: expected {(n_h, 1)}, got {b1.shape}"
+    assert W2.shape == (n_y, n_h), f"W2 shape mismatch: expected {(n_y, n_h)}, got {W2.shape}"
+    assert b2.shape == (n_y, 1), f"b2 shape mismatch: expected {(n_y, 1)}, got {b2.shape}"
+
+    parameters = {"W1": W1,
+                  "b1": b1,
+                  "W2": W2,
+                  "b2": b2}
+
+    return parameters
+
+def linear_activation_forward(A_prev, W, b, activation):
+    """
+    Implement the forward propagation for the LINEAR->ACTIVATION layer.
+
+    Arguments:
+    A_prev -- activations from previous layer (or input data): (size of previous layer, number of examples)
+    W -- weights matrix: numpy array of shape (size of current layer, size of previous layer)
+    b -- bias vector, numpy array of shape (size of the current layer, 1)
+    activation -- the activation to be used: "sigmoid" or "relu"
+
+    Returns:
+    A -- the output of the activation function
+    cache -- a tuple containing "linear_cache" and "activation_cache" for backward propagation
+    """
+
+    def linear_forward(A, W, b):
+        Z = np.dot(W, A) + b
+        cache = (A, W, b)
+        return Z, cache
+
+    def relu(Z):
+        A = np.maximum(0, Z)
+        cache = Z
+        return A, cache
+
+    def sigmoid(Z):
+        A = 1 / (1 + np.exp(-Z))
+        cache = Z
+        return A, cache
+
+    if activation == "sigmoid":
+        Z, linear_cache = linear_forward(A_prev, W, b)
+        A, activation_cache = sigmoid(Z)
+    elif activation == "relu":
+        Z, linear_cache = linear_forward(A_prev, W, b)
+        A, activation_cache = relu(Z)
+    else:
+        raise ValueError("Invalid activation function")
+
+    cache = (linear_cache, activation_cache)
+    return A, cache
+def compute_cost(AL, Y):
+    """
+    Compute the cross-entropy cost.
+
+    Arguments:
+    AL -- probability vector corresponding to your label predictions, shape (1, number of examples)
+    Y -- true "label" vector (containing 0 if non-cat, 1 if cat), shape (1, number of examples)
+
+    Returns:
+    cost -- cross-entropy cost
+    """
+
+    m = Y.shape[1]
+    epsilon = 1e-15  # To prevent log(0)
+
+    cost = (-1 / m) * np.sum(Y * np.log(AL + epsilon) + (1 - Y) * np.log(1 - AL + epsilon))
+    cost = np.squeeze(cost)  # Makes sure cost is a scalar
+
+    return cost
+def linear_activation_backward(dA, cache, activation):
+    """
+    Implement the backward propagation for the LINEAR->ACTIVATION layer.
+
+    Arguments:
+    dA -- post-activation gradient for current layer l
+    cache -- tuple of values (linear_cache, activation_cache) from forward propagation
+    activation -- the activation to be used: "sigmoid" or "relu"
+
+    Returns:
+    dA_prev -- Gradient of the cost with respect to the activation of the previous layer
+    dW -- Gradient of the cost with respect to W (current layer l), same shape as W
+    db -- Gradient of the cost with respect to b (current layer l), same shape as b
+    """
+
+    def linear_backward(dZ, cache):
+        A_prev, W, b = cache
+        m = A_prev.shape[1]
+
+        dW = (1 / m) * np.dot(dZ, A_prev.T)
+        db = (1 / m) * np.sum(dZ, axis=1, keepdims=True)
+        dA_prev = np.dot(W.T, dZ)
+
+        return dA_prev, dW, db
+
+    def relu_backward(dA, cache):
+        Z = cache
+        dZ = np.array(dA, copy=True)
+        dZ[Z <= 0] = 0
+        return dZ
+
+    def sigmoid_backward(dA, cache):
+        Z = cache
+        s = 1 / (1 + np.exp(-Z))
+        dZ = dA * s * (1 - s)
+        return dZ
+
+    linear_cache, activation_cache = cache
+
+    if activation == "relu":
+        dZ = relu_backward(dA, activation_cache)
+    elif activation == "sigmoid":
+        dZ = sigmoid_backward(dA, activation_cache)
+    else:
+        raise ValueError("Invalid activation function")
+
+    dA_prev, dW, db = linear_backward(dZ, linear_cache)
+    return dA_prev, dW, db
+def update_parameters(parameters, grads, learning_rate):
+    """
+    Update parameters using gradient descent.
+
+    Arguments:
+    parameters -- python dictionary containing your parameters
+    grads -- python dictionary containing your gradients
+    learning_rate -- learning rate for gradient descent
+
+    Returns:
+    parameters -- python dictionary containing your updated parameters
+    """
+
+    L = len(parameters) // 2  # number of layers in the neural network
+
+    for l in range(1, L + 1):
+        parameters["W" + str(l)] -= learning_rate * grads["dW" + str(l)]
+        parameters["b" + str(l)] -= learning_rate * grads["db" + str(l)]
+
+    return parameters
 
 
 def sigmoid(Z):
