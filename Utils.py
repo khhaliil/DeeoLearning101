@@ -18,9 +18,7 @@ plt.rcParams['image.cmap'] = 'gray'
 np.random.seed(1)
 
 
-# Flatten and normalize
-train_x_flatten = train_x_orig.reshape(train_x_orig.shape[0], -1).T  # Shape (num_px*num_px*3, m)
-train_x = train_x_flatten / 255.
+
 
 # Define layer dimensions
 layers_dims = [train_x.shape[0], 20, 7, 5, 1]  # Example layer dimensions
@@ -215,9 +213,4 @@ def predict(X, y, parameters):
 
     return p
 
-# Train the model
-parameters = L_layer_model(train_x, train_y, layers_dims, learning_rate=0.0075,
-                           num_iterations=2500, print_cost=True)
 
-# Predict on training set
-predictions_train = predict(train_x, train_y, parameters)
