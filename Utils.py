@@ -20,8 +20,6 @@ np.random.seed(1)
 
 
 
-# Define layer dimensions
-layers_dims = [train_x.shape[0], 20, 7, 5, 1]  # Example layer dimensions
 
 def sigmoid(Z):
     A = 1 / (1 + np.exp(-Z))
