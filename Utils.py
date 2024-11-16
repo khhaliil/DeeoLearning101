@@ -17,17 +17,6 @@ plt.rcParams['image.cmap'] = 'gray'
 
 np.random.seed(1)
 
-# Load and preprocess data (adjust according to your dataset)
-def load_data():
-    train_dataset = h5py.File('train_catvnoncat.h5', "r")
-    train_set_x_orig = np.array(train_dataset["train_set_x"][:])  # Train set features
-    train_set_y_orig = np.array(train_dataset["train_set_y"][:])  # Train set labels
-
-    train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
-
-    return train_set_x_orig, train_set_y_orig
-
-train_x_orig, train_y = load_data()
 
 # Flatten and normalize
 train_x_flatten = train_x_orig.reshape(train_x_orig.shape[0], -1).T  # Shape (num_px*num_px*3, m)
